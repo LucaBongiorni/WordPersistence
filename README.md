@@ -1,0 +1,4 @@
+WordPersistence
+===============
+
+Persists in Word.
